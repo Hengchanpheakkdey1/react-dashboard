@@ -16,7 +16,8 @@ import ProductModal from "../component/productsDetails";
 import EditModal from "../component/editmodal";
 import DeleteModal from "../component/deletemodal";
 
-const API = "https://api.escuelajs.co/api/v1/products";
+const API = import.meta.env.VITE_BASE_URL_API;
+
 
 export default function Products() {
   const [products, setProducts] = useState([]);
@@ -31,7 +32,7 @@ export default function Products() {
   useEffect(() => {
     async function fetchProducts() {
       try {
-        const response = await fetch(`${API}/?limit=200`);
+        const response = await fetch(`${API}/products/?limit=200`);
         const data = await response.json();
         setProducts(data);
       } catch (error) {
