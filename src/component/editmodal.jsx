@@ -32,7 +32,7 @@ export default function EditModal({ product, onClose, onUpdated }) {
         setSaving(true)
         try {
             const res = await fetch(`${API}/${product.id}`, {
-                method: 'POST',
+                method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     title: form.title,

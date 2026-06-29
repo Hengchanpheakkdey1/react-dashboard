@@ -1,6 +1,28 @@
+import { useState } from 'react'
 import { AlertTriangle } from 'lucide-react'
 
-export default function DeleteModal({ product, onClose, onConfirm, deleting }) {
+const API = 'https://api.escuelajs.co/api/v1/products'
+
+export default function DeleteModal({ product, onClose, onDeleted }) {
+    const [deleting, setDeleting] = useState(false)
+
+    const handleSubmit = async (e) => {
+        e.preventDefault()
+        setDeleting(true)
+        try {
+            console.log('DELETE request:', `${API}/${product.id}`)
+            const res = await fetch(`${API}/${product.id}`, {
+                method: 'DELETE',
+            })
+            console.log('DELETE response:', res.status, res.ok)
+            onDeleted(product.id)
+            onClose()
+        } catch (err) {
+            console.error('DELETE error:', err)
+            setDeleting(false)
+        }
+    }
+
     const handleBackdrop = (e) => {
         if (e.target === e.currentTarget) onClose()
     }
@@ -39,7 +61,7 @@ export default function DeleteModal({ product, onClose, onConfirm, deleting }) {
                         Cancel
                     </button>
                     <button
-                        onClick={onConfirm}
+                        onClick={handleSubmit}
                         disabled={deleting}
                         className="flex-1 py-2 text-[12px] font-semibold text-white bg-red-500 hover:bg-red-600 rounded-xl transition-colors cursor-pointer border-0 disabled:opacity-60 disabled:cursor-not-allowed"
                     >

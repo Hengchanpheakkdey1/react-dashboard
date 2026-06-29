@@ -15,7 +15,6 @@ export default function Products() {
     const [products, setProducts] = useState([])
     const [loading, setLoading] = useState(true)
     const [search, setSearch] = useState('')
-    const [deletingId, setDeletingId] = useState(null)
     const [deleteTarget, setDeleteTarget] = useState(null)
     const [selectedProduct, setSelectedProduct] = useState(null)
     const [editProduct, setEditProduct] = useState(null)
@@ -40,18 +39,6 @@ export default function Products() {
     // Open the delete confirmation modal
     function handleDelete(product) {
         setDeleteTarget(product)
-    }
-
-    // Called when user confirms deletion inside the modal
-    async function confirmDelete() {
-        setDeletingId(deleteTarget.id)
-        try {
-            await fetch(`${API}/${deleteTarget.id}`, { method: 'DELETE' })
-            setProducts(products.filter(p => p.id !== deleteTarget.id))
-            setDeleteTarget(null)
-        } finally {
-            setDeletingId(null)
-        }
     }
 
     // Update a product in the list after editing
@@ -219,8 +206,7 @@ export default function Products() {
                                             </button>
                                             <button
                                                 onClick={() => handleDelete(product)}
-                                                disabled={deletingId === product.id}
-                                                className="w-6 h-6 flex items-center justify-center rounded-md text-gray-400 hover:bg-red-50 hover:text-red-500 transition-colors cursor-pointer border-0 bg-transparent disabled:opacity-40"
+                                                className="w-6 h-6 flex items-center justify-center rounded-md text-gray-400 hover:bg-red-50 hover:text-red-500 transition-colors cursor-pointer border-0 bg-transparent"
                                             >
                                                 <Trash2 size={11} />
                                             </button>
@@ -254,8 +240,10 @@ export default function Products() {
                     <DeleteModal
                         product={deleteTarget}
                         onClose={() => setDeleteTarget(null)}
-                        onConfirm={confirmDelete}
-                        deleting={deletingId === deleteTarget.id}
+                        onDeleted={(id) => {
+                            setProducts(prev => prev.filter(p => p.id !== id))
+                            setDeleteTarget(null)
+                        }}
                     />
                 )}
             </div>
