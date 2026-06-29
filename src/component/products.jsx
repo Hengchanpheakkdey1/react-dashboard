@@ -16,6 +16,7 @@ export default function Products() {
     const [loading, setLoading] = useState(true)
     const [search, setSearch] = useState('')
     const [deleteTarget, setDeleteTarget] = useState(null)
+    const [deleting, setDeleting] = useState(false)
     const [selectedProduct, setSelectedProduct] = useState(null)
     const [editProduct, setEditProduct] = useState(null)
 
@@ -36,9 +37,21 @@ export default function Products() {
         fetchProducts()
     }, [])
 
-    // Open the delete confirmation modal
     function handleDelete(product) {
         setDeleteTarget(product)
+    }
+
+    async function handleDeleteConfirm(id) {
+        setDeleting(true)
+        try {
+            await fetch(`${API}/${id}`, { method: 'DELETE' })
+            setProducts(prev => prev.filter(p => p.id !== id))
+            setDeleteTarget(null)
+        } catch (err) {
+            console.error('DELETE error:', err)
+        } finally {
+            setDeleting(false)
+        }
     }
 
     // Update a product in the list after editing
@@ -239,11 +252,9 @@ export default function Products() {
                 {deleteTarget && (
                     <DeleteModal
                         product={deleteTarget}
+                        deleting={deleting}
                         onClose={() => setDeleteTarget(null)}
-                        onDeleted={(id) => {
-                            setProducts(prev => prev.filter(p => p.id !== id))
-                            setDeleteTarget(null)
-                        }}
+                        onConfirm={handleDeleteConfirm}
                     />
                 )}
             </div>
